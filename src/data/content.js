@@ -10,7 +10,7 @@ export const content = {
   title: 'Senior Software Engineer',
   tagline: '5 years building scalable systems and shipping products that matter.',
   email: 'jtoniolo2314@gmail.com',
-  github: 'https://github.com/jtoniolo2314',
+  github: 'https://github.com/SystemSquatch',
   linkedin: 'https://linkedin.com/in/joseph-toniolo',
 
   // ── About / Bio ───────────────────────────────────────────
