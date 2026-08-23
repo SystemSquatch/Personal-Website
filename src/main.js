@@ -166,6 +166,13 @@ function initNav() {
 
   window.addEventListener('scroll', onScroll, { passive: true })
   onScroll()
+
+  const logo = document.querySelector('.nav__logo')
+  logo.addEventListener('click', (e) => {
+    e.preventDefault()
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    history.replaceState(null, '', window.location.pathname + window.location.search)
+  })
 }
 
 // ── Mobile Hamburger ───────────────────────────────────────

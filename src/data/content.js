@@ -11,7 +11,7 @@ export const content = {
   tagline: '5 years building scalable systems and shipping products that matter.',
   email: 'jtoniolo2314@gmail.com',
   github: 'https://github.com/SystemSquatch',
-  linkedin: 'https://linkedin.com/in/joseph-toniolo',
+  linkedin: 'https://www.linkedin.com/in/joseph-toniolo/',
 
   // ── About / Bio ───────────────────────────────────────────
   // Supports inline HTML (<strong>, <a>, <br>)
