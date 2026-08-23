@@ -18,7 +18,8 @@ dist/
 Thumbs.db
 
 # Editor
-.vscode/
+.vscode/*
+!.vscode/tasks.json
 .idea/
 *.suo
 *.ntvs*
