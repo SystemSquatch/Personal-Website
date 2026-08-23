@@ -8,56 +8,94 @@ export const content = {
   // ── Personal ──────────────────────────────────────────────
   name: 'Joseph Toniolo',
   title: 'Senior Software Engineer',
-  tagline: '5 years building scalable systems and shipping products that matter.',
+  tagline: 'Full-stack engineer who likes taking on the problems nobody else wants to touch.',
   email: 'jtoniolo2314@gmail.com',
   github: 'https://github.com/SystemSquatch',
   linkedin: 'https://www.linkedin.com/in/joseph-toniolo/',
 
   // ── About / Bio ───────────────────────────────────────────
   // Supports inline HTML (<strong>, <a>, <br>)
-  bio: `I'm a Senior Software Engineer with 5 years of full-time experience designing
-and building production systems. I care about code that's maintainable,
-performance that's measurable, and software that actually ships.
+  bio: `I'm a full-stack software engineer and technical lead with experience across
+backend, frontend, and cloud infrastructure — with growing depth in security,
+compliance, and accessibility.
 <br><br>
-I've worked across the stack — from distributed backend services to polished
-frontend products — and I thrive in environments where engineering quality matters.
-When I'm not writing code, I'm usually exploring new technologies or contributing
-to open source.`,
+I specialize in taking large, ambiguous initiatives from design through production:
+cloud migrations, event-driven data pipelines, search infrastructure, and
+government-grade compliance work. I also coordinate a UI development team,
+distributing work and aligning implementation while staying hands-on.`,
+
+  // ── Education ─────────────────────────────────────────────
+  // Shown as a small line in the footer, not its own section.
+  education: {
+    degree: 'B.S. Computer Information Technology',
+    school: 'Minnesota State University',
+  },
 
   // ── Experience ────────────────────────────────────────────
   // Most recent first. end: 'Present' for current role.
   experience: [
     {
-      company: 'Your Current Company',
+      company: 'Thomson Reuters',
       role: 'Senior Software Engineer',
-      start: 'Jan 2023',
+      start: 'Apr 2024',
       end: 'Present',
       bullets: [
-        'Led redesign of the data ingestion pipeline, reducing average latency by 40%.',
-        'Mentored junior engineers through code review, pair programming, and design doc feedback.',
-        'Shipped the real-time analytics dashboard used by enterprise customers.',
+        'Coordinate a UI development team for an AI-assisted research product — distributing work, aligning implementation, and owning frontend delivery.',
+        'Built React micro-frontend features, including a Redux state store and cross-MFE reference syncing, and stood up a new micro-frontend end-to-end with its supporting AWS infrastructure.',
+        'Stood up OpenSearch cluster access via infrastructure-as-code and built the pipeline that loads and vectorizes documents from S3 into OpenSearch, including zero-downtime re-indexing.',
+        'Designed the architecture for an event-driven fan-out delete pipeline using SNS and SQS with dead-letter queues for reliable, retryable cross-store data deletion.',
+        'Implemented a separate government/commercial encryption path with FIPS AMI support and dynamic authorization to enable compliant handling of FedRAMP data.',
       ],
     },
     {
-      company: 'Previous Company',
+      company: 'Thomson Reuters',
       role: 'Software Engineer',
       start: 'Jun 2021',
-      end: 'Dec 2022',
+      end: 'Apr 2024',
       bullets: [
-        'Built and maintained the REST API serving millions of requests per day with 99.9% uptime.',
-        'Migrated monolithic deployment to containerized microservices on cloud infrastructure.',
-        'Reduced CI build times by 60% by parallelizing test suites and caching dependencies.',
+        'Drove the migration of core services from on-prem Oracle to AWS Aurora PostgreSQL, partnering with backend and platform teams to set up dual-region disaster recovery and IAM-based authentication.',
+        'Helped architect a serverless AWS batch processing pipeline that replaced manual on-prem systems, personally building several of its core services.',
+        'Led an organization-wide security modernization initiative, coordinating KMS encryption at rest across S3, DynamoDB, Lambda, and ECR.',
+        'Owned the data-retention and purge subsystem across multiple releases, redesigning foreign-key/cascade behavior and resolving orphaned-data edge cases in production.',
+        'Winner of the 2023 Thomson Reuters AI/ML Hackathon.',
       ],
     },
+  ],
+
+  // ── Highlights ────────────────────────────────────────────
+  // Deep-dive case studies (problem → approach → outcome). Most recent first.
+  highlights: [
     {
-      company: 'First Company',
-      role: 'Junior Software Engineer',
-      start: 'Jul 2020',
-      end: 'May 2021',
-      bullets: [
-        'Delivered multiple client projects across web, mobile, and API integration.',
-        'Introduced automated end-to-end testing, cutting QA cycle time in half.',
-      ],
+      title: 'OpenSearch Search-Data Platform',
+      period: '2026',
+      problem: 'The product needed documents searchable in OpenSearch, but there was no provisioned cluster access and no reliable way to load, reshape, or re-index the underlying data at scale.',
+      approach: 'Stood up OpenSearch cluster access via infrastructure-as-code, designed the index mappings, and built the pipeline that loads and vectorizes documents from S3 into OpenSearch — including large-file batch vectorization and zero-downtime re-indexing via alias swap.',
+      outcome: 'Delivered a repeatable, IaC-managed search-data platform that can ingest and re-index documents without downtime.',
+      tech: ['OpenSearch', 'S3', 'CloudFormation', 'PostgreSQL'],
+    },
+    {
+      title: 'Event-Driven Delete Pipeline',
+      period: '2026',
+      problem: 'Deleting a workspace meant removing its data from many independent stores; a single missed target would leave orphaned data and compliance risk.',
+      approach: 'Designed the architecture for an event-driven fan-out delete pipeline using SNS and SQS with dead-letter queues, building the core pieces and a database progress tracker to make the delete observable and recoverable.',
+      outcome: 'Made cross-store deletion reliable and retryable, with failures isolated to dead-letter queues instead of silently dropping data.',
+      tech: ['SNS', 'SQS', 'OpenSearch', 'S3'],
+    },
+    {
+      title: 'Government-Grade Compliance (FedRAMP / FIPS)',
+      period: '2025',
+      problem: 'Government customers required stricter, separated encryption handling than commercial users.',
+      approach: 'Implemented a separate government/commercial encryption path, FIPS AMI support, and dynamic authorization, handling signed/GPG file flows per user type.',
+      outcome: 'Enabled compliant handling of government-customer data alongside the commercial flow.',
+      tech: ['FedRAMP', 'FIPS', 'OIDC/JWT', 'GPG'],
+    },
+    {
+      title: 'AI-Assisted Research Product Frontend',
+      period: '2025–2026',
+      problem: 'An AI-assisted research product needed a modern, usable, and responsive interface.',
+      approach: 'Built React micro-frontend features — a Redux state store, cross-MFE reference syncing with a legacy web app, and responsive layouts — and stood up a new micro-frontend end-to-end with its supporting AWS infrastructure.',
+      outcome: 'Delivered core UI for a strategic AI product and modernized the frontend architecture.',
+      tech: ['React', 'Redux', 'TypeScript', 'AWS'],
     },
   ],
 
@@ -66,19 +104,27 @@ to open source.`,
   skills: [
     {
       category: 'Languages',
-      items: ['JavaScript', 'TypeScript', 'Python', 'Go', 'SQL'],
+      items: ['Java', 'Python', 'TypeScript', 'SQL'],
     },
     {
       category: 'Frameworks & Libraries',
-      items: ['Node.js', 'React', 'Express', 'FastAPI', 'Vite'],
+      items: ['Spring / Spring Boot', 'React', 'Redux', 'FastAPI'],
     },
     {
-      category: 'Tools & Platforms',
-      items: ['Git', 'Docker', 'Kubernetes', 'Terraform', 'GitHub Actions'],
+      category: 'Cloud & Infrastructure (AWS)',
+      items: ['Lambda', 'S3', 'DynamoDB', 'EventBridge', 'SNS/SQS', 'KMS', 'AWS Transfer', 'CloudFormation'],
     },
     {
-      category: 'Cloud & Databases',
-      items: ['AWS', 'GCP', 'Firebase', 'PostgreSQL', 'Redis', 'MongoDB'],
+      category: 'Data & Search',
+      items: ['PostgreSQL (Aurora)', 'Oracle', 'OpenSearch', 'Elasticsearch'],
+    },
+    {
+      category: 'Security & Compliance',
+      items: ['FedRAMP / FIPS', 'OIDC / JWT', 'WCAG 2.2 AA / Section 508', 'Veracode / Snyk'],
+    },
+    {
+      category: 'DevOps & Practices',
+      items: ['GitHub Actions', 'CI/CD', 'Datadog', 'SonarQube'],
     },
   ],
 

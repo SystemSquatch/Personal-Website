@@ -73,6 +73,33 @@ function renderSkills() {
   `).join('')
 }
 
+function renderHighlights() {
+  const container = document.getElementById('highlightsGrid')
+  container.innerHTML = content.highlights.map(item => `
+    <div class="highlight-card glass" data-animate>
+      <div class="highlight-card__header">
+        <div class="highlight-card__title">${item.title}</div>
+        <div class="highlight-card__period">${item.period}</div>
+      </div>
+      <div class="highlight-card__section">
+        <div class="highlight-card__label">Problem</div>
+        <p>${item.problem}</p>
+      </div>
+      <div class="highlight-card__section">
+        <div class="highlight-card__label">Approach</div>
+        <p>${item.approach}</p>
+      </div>
+      <div class="highlight-card__section">
+        <div class="highlight-card__label">Outcome</div>
+        <p>${item.outcome}</p>
+      </div>
+      <div class="highlight-card__tech">
+        ${item.tech.map(t => `<span class="skill-pill">${t}</span>`).join('')}
+      </div>
+    </div>
+  `).join('')
+}
+
 function renderProjects() {
   const container = document.getElementById('projectsGrid')
   container.innerHTML = content.projects.map(project => `
@@ -93,6 +120,11 @@ function renderProjects() {
       </div>
     </div>
   `).join('')
+}
+
+function renderFooter() {
+  document.getElementById('footerEdu').textContent =
+    `${content.education.degree} — ${content.education.school}`
 }
 
 function renderContact() {
@@ -206,9 +238,11 @@ document.addEventListener('DOMContentLoaded', () => {
   renderHero()
   renderAbout()
   renderTimeline()
+  renderHighlights()
   renderSkills()
   renderProjects()
   renderContact()
+  renderFooter()
 
   // Observe [data-animate] elements — must run after injection
   initScrollAnimations()
