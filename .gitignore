@@ -7,6 +7,7 @@ dist/
 # Firebase
 .firebase/
 .firebaserc.local
+pglite-debug.log
 
 # Env / secrets
 .env

@@ -15,9 +15,9 @@ export const content = {
 
   // ── About / Bio ───────────────────────────────────────────
   // Supports inline HTML (<strong>, <a>, <br>)
-  bio: `I'm a full-stack software engineer and technical lead with experience across
-backend, frontend, and cloud infrastructure — with growing depth in security,
-compliance, and accessibility.
+  bio: `I'm a full-stack software engineer with experience across backend, frontend,
+and cloud infrastructure, plus growing depth in security, compliance, and
+accessibility.
 <br><br>
 I specialize in taking large, ambiguous initiatives from design through production:
 cloud migrations, event-driven data pipelines, search infrastructure, and
@@ -40,7 +40,7 @@ distributing work and aligning implementation while staying hands-on.`,
       start: 'Apr 2024',
       end: 'Present',
       bullets: [
-        'Coordinate a UI development team for an AI-assisted research product — distributing work, aligning implementation, and owning frontend delivery.',
+        'Coordinate a UI development team for an AI-assisted research product, distributing work, aligning implementation, and owning frontend delivery.',
         'Built React micro-frontend features, including a Redux state store and cross-MFE reference syncing, and stood up a new micro-frontend end-to-end with its supporting AWS infrastructure.',
         'Stood up OpenSearch cluster access via infrastructure-as-code and built the pipeline that loads and vectorizes documents from S3 into OpenSearch, including zero-downtime re-indexing.',
         'Designed the architecture for an event-driven fan-out delete pipeline using SNS and SQS with dead-letter queues for reliable, retryable cross-store data deletion.',
@@ -69,7 +69,7 @@ distributing work and aligning implementation while staying hands-on.`,
       title: 'OpenSearch Search-Data Platform',
       period: '2026',
       problem: 'The product needed documents searchable in OpenSearch, but there was no provisioned cluster access and no reliable way to load, reshape, or re-index the underlying data at scale.',
-      approach: 'Stood up OpenSearch cluster access via infrastructure-as-code, designed the index mappings, and built the pipeline that loads and vectorizes documents from S3 into OpenSearch — including large-file batch vectorization and zero-downtime re-indexing via alias swap.',
+      approach: 'Stood up OpenSearch cluster access via infrastructure-as-code, designed the index mappings, and built the pipeline that loads and vectorizes documents from S3 into OpenSearch, including large-file batch vectorization and zero-downtime re-indexing via alias swap.',
       outcome: 'Delivered a repeatable, IaC-managed search-data platform that can ingest and re-index documents without downtime.',
       tech: ['OpenSearch', 'S3', 'CloudFormation', 'PostgreSQL'],
     },
@@ -91,9 +91,9 @@ distributing work and aligning implementation while staying hands-on.`,
     },
     {
       title: 'AI-Assisted Research Product Frontend',
-      period: '2025–2026',
+      period: '2025-2026',
       problem: 'An AI-assisted research product needed a modern, usable, and responsive interface.',
-      approach: 'Built React micro-frontend features — a Redux state store, cross-MFE reference syncing with a legacy web app, and responsive layouts — and stood up a new micro-frontend end-to-end with its supporting AWS infrastructure.',
+      approach: 'Built React micro-frontend features, including a Redux state store, cross-MFE reference syncing with a legacy web app, and responsive layouts, and stood up a new micro-frontend end-to-end with its supporting AWS infrastructure.',
       outcome: 'Delivered core UI for a strategic AI product and modernized the frontend architecture.',
       tech: ['React', 'Redux', 'TypeScript', 'AWS'],
     },
@@ -130,29 +130,37 @@ distributing work and aligning implementation while staying hands-on.`,
 
   // ── Projects ──────────────────────────────────────────────
   // liveUrl: null hides the "Live Demo" button automatically.
+  // links: one entry per repo to show as a button (most projects have 1).
   projects: [
     {
-      title: 'Distributed Task Queue',
+      title: 'PokeDataPipeline',
       description:
-        'A Redis-backed distributed task queue with priority scheduling, retry logic, and a real-time monitoring dashboard. Built to handle high-throughput job processing in production.',
-      tech: ['Go', 'Redis', 'Docker', 'React'],
-      githubUrl: 'https://github.com/jtoniolo2314/task-queue',
+        'A Python ETL pipeline that ingests Pokémon data from both PokeAPI and Bulbapedia into a self-hosted PostgreSQL database, covering items, Pokémon, moves, abilities, evolution chains, and locations. Writes are fully idempotent, so a multi-hour ingestion run can be safely stopped and resumed, and the resulting database is designed to be queried directly by a local LLM that generates SQL to answer natural-language Pokémon questions.',
+      tech: ['Python', 'PostgreSQL', 'Docker', 'PokeAPI', 'Bulbapedia'],
+      links: [
+        { label: 'GitHub', url: 'https://github.com/SystemSquatch/PokeDataPipeline' },
+      ],
       liveUrl: null,
     },
     {
-      title: 'CLI Dev Tool',
+      title: 'DexDB',
       description:
-        'A developer productivity CLI that scaffolds projects, manages environment configs, and integrates with GitHub and Jira APIs to streamline the development workflow.',
-      tech: ['Node.js', 'TypeScript', 'Commander.js'],
-      githubUrl: 'https://github.com/jtoniolo2314/dev-cli',
+        'A full-stack Pokédex web app with a React/Vite frontend and a Node.js backend over PostgreSQL, including damage and catch-rate calculators, type-effectiveness lookups, ~19,000 locally cached sprite images, and an embedded chat widget wired into the Professor Sakura AI agent.',
+      tech: ['React', 'Vite', 'Node.js', 'PostgreSQL'],
+      links: [
+        { label: 'GitHub', url: 'https://github.com/SystemSquatch/DexDB-App' },
+      ],
       liveUrl: null,
     },
     {
-      title: 'Portfolio Site',
+      title: 'Professor Sakura',
       description:
-        'This site. Built with Vite and vanilla JS, dark glassmorphism design system, deployed to Firebase Hosting with zero runtime dependencies.',
-      tech: ['Vite', 'JavaScript', 'CSS', 'Firebase'],
-      githubUrl: 'https://github.com/jtoniolo2314/personal-website',
+        'A tool-calling AI Pokémon "professor" with a persona hard-blocked from ever guessing game data from model memory; every fact comes from a live tool call against a self-hosted Postgres database, falling back to PokeAPI if it\'s unreachable. Runs as a FastAPI/CLI service with a swappable backend (Ollama on my home server, or Gemini in the cloud), plus a Discord bot front end sharing the same tool-calling pattern.',
+      tech: ['Python', 'FastAPI', 'Ollama', 'Gemini', 'PostgreSQL', 'discord.js'],
+      links: [
+        { label: 'GitHub (Agent)', url: 'https://github.com/SystemSquatch/Professor-Sakura' },
+        { label: 'GitHub (Discord Bot)', url: 'https://github.com/SystemSquatch/Professor-Sakura-Discord-Bot' },
+      ],
       liveUrl: null,
     },
   ],

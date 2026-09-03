@@ -51,7 +51,7 @@ function renderTimeline() {
   const container = document.getElementById('timeline')
   container.innerHTML = content.experience.map(job => `
     <div class="timeline__item glass" data-animate>
-      <div class="timeline__date">${job.start} — ${job.end}</div>
+      <div class="timeline__date">${job.start} - ${job.end}</div>
       <div class="timeline__role">${job.role}</div>
       <div class="timeline__company">${job.company}</div>
       <ul class="timeline__bullets">
@@ -110,9 +110,10 @@ function renderProjects() {
         ${project.tech.map(t => `<span class="skill-pill">${t}</span>`).join('')}
       </div>
       <div class="project-card__links">
-        <a href="${project.githubUrl}" target="_blank" rel="noopener noreferrer" class="project-card__link">
-          ${icons.github} GitHub ${icons.arrowRight}
-        </a>
+        ${project.links.map(link => `
+        <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="project-card__link">
+          ${link.url.includes('github.com') ? `${icons.github} ${link.label} ${icons.arrowRight}` : `${icons.external} ${link.label}`}
+        </a>`).join('')}
         ${project.liveUrl ? `
         <a href="${project.liveUrl}" target="_blank" rel="noopener noreferrer" class="project-card__link">
           ${icons.external} Live Demo
@@ -124,7 +125,7 @@ function renderProjects() {
 
 function renderFooter() {
   document.getElementById('footerEdu').textContent =
-    `${content.education.degree} — ${content.education.school}`
+    `${content.education.degree} - ${content.education.school}`
 }
 
 function renderContact() {
