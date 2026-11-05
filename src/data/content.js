@@ -26,8 +26,11 @@ export const content = {
         description:
           'An AI Pokémon professor you can chat with inside my DexDB app, designed to answer from live tool calls, not model memory.',
         videoAlt: 'Silent demo of Professor Sakura answering a question about Bulbasaur in the DexDB app, followed by the evolution chain that confirms her answer.',
-        video: { mp4: '/demos/sakura.mp4', webm: '/demos/sakura.webm' },
-        poster: '/demos/sakura-poster.jpg',
+        video: {
+          mp4: 'https://systemsquatch.github.io/portfolio-media/sakura.mp4',
+          webm: 'https://systemsquatch.github.io/portfolio-media/sakura.webm',
+        },
+        poster: 'https://systemsquatch.github.io/portfolio-media/sakura-poster.jpg',
         stages: [
           { label: 'Question', at: 0 },
           { label: 'Tool call', at: 7.8 },
