@@ -48,7 +48,14 @@ function initHeroDemo() {
           aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${demo.label}</button>`).join('')}
       </div>
       <div id="demoPanel" role="tabpanel" aria-labelledby="demoTab0">
-        <div class="demo__screen" id="demoScreen"></div>
+        <div class="demo__screen" id="demoScreen">
+          <video muted loop playsinline preload="none" ${canAutoplay ? '' : 'controls'}></video>
+          <button type="button" class="demo__sound" hidden>Play with sound</button>
+          <div class="demo__placeholder" hidden>
+            <div class="demo__placeholder-title"></div>
+            <div class="demo__placeholder-note">Demo recording coming soon</div>
+          </div>
+        </div>
         <ol class="demo__pipeline" id="demoPipeline"></ol>
         <p class="demo__desc" id="demoDesc"></p>
       </div>
@@ -60,10 +67,23 @@ function initHeroDemo() {
   const screen = root.querySelector('#demoScreen')
   const pipeline = root.querySelector('#demoPipeline')
   const desc = root.querySelector('#demoDesc')
+  // One player for every demo. Phones allow few video players at once and release
+  // removed ones slowly, so creating a new one per tab switch left them black.
+  const player = screen.querySelector('video')
+  const sound = screen.querySelector('.demo__sound')
+  const placeholder = screen.querySelector('.demo__placeholder')
+  const placeholderTitle = screen.querySelector('.demo__placeholder-title')
 
   let video = null
+  let currentDemo = null
+  let lastTime = 0
   let timer = null
   let isOnScreen = false
+
+  function setMuted(muted) {
+    player.muted = muted
+    sound.textContent = muted ? 'Play with sound' : 'Mute'
+  }
 
   function highlightStage(index) {
     ;[...pipeline.children].forEach((el, i) => el.classList.toggle('is-active', i === index))
@@ -99,67 +119,70 @@ function initHeroDemo() {
 
   function showPlaceholder(demo) {
     video = null
-    screen.innerHTML = `
-      <div class="demo__placeholder">
-        <div class="demo__placeholder-title">${demo.label}</div>
-        <div class="demo__placeholder-note">Demo recording coming soon</div>
-      </div>
-    `
+    player.pause()
+    player.replaceChildren()
+    player.hidden = true
+    sound.hidden = true
+    placeholderTitle.textContent = demo.label
+    placeholder.hidden = false
   }
 
   function showVideo(demo) {
-    screen.innerHTML = `
-      <video muted loop playsinline preload="none" ${canAutoplay ? '' : 'controls'}
-        ${demo.poster ? `poster="${demo.poster}"` : ''} aria-label="${demo.videoAlt}">
-        ${demo.video.webm ? `<source src="${demo.video.webm}" type="video/webm" />` : ''}
-        <source src="${demo.video.mp4}" type="video/mp4" />
-      </video>
-      ${demo.hasAudio && canAutoplay ? '<button type="button" class="demo__sound">Play with sound</button>' : ''}
+    video = player
+    currentDemo = demo
+    lastTime = 0
+    placeholder.hidden = true
+    player.hidden = false
+
+    player.pause()
+    player.poster = demo.poster || ''
+    player.setAttribute('aria-label', demo.videoAlt)
+    // MP4 first: phones decode H.264 in hardware, and the files are about the same size.
+    player.innerHTML = `
+      <source src="${demo.video.mp4}" type="video/mp4" />
+      ${demo.video.webm ? `<source src="${demo.video.webm}" type="video/webm" />` : ''}
     `
-    video = screen.querySelector('video')
-
-    if (canAutoplay) {
-      const sound = screen.querySelector('.demo__sound')
-      const clip = video
-      let lastTime = 0
-
-      function setMuted(muted) {
-        clip.muted = muted
-        sound.textContent = muted ? 'Play with sound' : 'Mute'
-      }
-
-      sound?.addEventListener('click', () => {
-        if (!clip.muted) {
-          setMuted(true)
-          return
-        }
-        // Start over so the visitor hears the question, not the middle of the reply.
-        clip.currentTime = 0
-        lastTime = 0
-        setMuted(false)
-        clip.play().catch(() => setMuted(true))
-      })
-
-      highlightStage(0)
-      clip.addEventListener('timeupdate', () => {
-        // Sound plays through once, then the loop continues muted.
-        if (sound && !clip.muted && clip.currentTime < lastTime - 1) setMuted(true)
-        lastTime = clip.currentTime
-
-        let index = 0
-        demo.stages.forEach((stage, i) => {
-          if (stage.at <= clip.currentTime) index = i
-        })
-        highlightStage(index)
-      })
-    } else {
-      highlightAllStages()
-    }
-
     // If the hosted file fails to load, fall back to the placeholder.
-    screen.querySelector('source:last-of-type').addEventListener('error', () => {
+    player.querySelector('source:last-of-type').addEventListener('error', () => {
       showPlaceholder(demo)
       syncPlayback()
+    })
+    setMuted(true)
+    player.load()
+
+    sound.hidden = !(demo.hasAudio && canAutoplay)
+    if (canAutoplay) highlightStage(0)
+    else highlightAllStages()
+  }
+
+  if (canAutoplay) {
+    sound.addEventListener('click', () => {
+      if (!player.muted) {
+        setMuted(true)
+        return
+      }
+      // Start over so the visitor hears the question, not the middle of the reply.
+      player.currentTime = 0
+      lastTime = 0
+      setMuted(false)
+      player.play().catch(() => setMuted(true))
+    })
+
+    player.addEventListener('timeupdate', () => {
+      // Sound plays through once, then the loop continues muted.
+      if (!player.muted && player.currentTime < lastTime - 1) setMuted(true)
+      lastTime = player.currentTime
+
+      let index = 0
+      currentDemo.stages.forEach((stage, i) => {
+        if (stage.at <= player.currentTime) index = i
+      })
+      highlightStage(index)
+    })
+
+    // A play() made before a new clip is ready can be dropped, so try again here.
+    player.addEventListener('canplay', () => {
+      if (video && isOnScreen) player.play().catch(() => {})
     })
   }
 
@@ -173,7 +196,6 @@ function initHeroDemo() {
     pipeline.innerHTML = demo.stages.map(stage => `<li class="demo__stage">${stage.label}</li>`).join('')
     desc.textContent = demo.description
 
-    video?.pause()
     if (demo.video) showVideo(demo)
     else showPlaceholder(demo)
     syncPlayback()

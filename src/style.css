@@ -409,6 +409,9 @@ button { font-family: var(--font); }
   object-fit: cover;
 }
 
+.demo__screen video[hidden],
+.demo__placeholder[hidden] { display: none; }
+
 .demo__sound {
   position: absolute;
   top: var(--sp-xs);
