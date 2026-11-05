@@ -28,6 +28,178 @@ function renderHero() {
   document.getElementById('heroTagline').textContent = content.tagline
 }
 
+// ── Hero Demo ──────────────────────────────────────────────
+// Tabbed demo frame. A demo with video: null shows a placeholder until its
+// recording exists; see the comment on hero.demos in content.js.
+const PLACEHOLDER_STAGE_MS = 1800
+
+function initHeroDemo() {
+  const root = document.getElementById('heroDemo')
+  const demos = content.hero.demos
+  const canAutoplay =
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+    navigator.connection?.saveData !== true
+
+  root.innerHTML = `
+    <div class="demo glass">
+      <div class="demo__tabs" role="tablist" aria-label="Project demos">
+        ${demos.map((demo, i) => `
+        <button type="button" class="demo__tab" role="tab" id="demoTab${i}" aria-controls="demoPanel"
+          aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${demo.label}</button>`).join('')}
+      </div>
+      <div id="demoPanel" role="tabpanel" aria-labelledby="demoTab0">
+        <div class="demo__screen" id="demoScreen"></div>
+        <ol class="demo__pipeline" id="demoPipeline"></ol>
+        <p class="demo__desc" id="demoDesc"></p>
+      </div>
+    </div>
+  `
+
+  const tabs = [...root.querySelectorAll('.demo__tab')]
+  const panel = root.querySelector('#demoPanel')
+  const screen = root.querySelector('#demoScreen')
+  const pipeline = root.querySelector('#demoPipeline')
+  const desc = root.querySelector('#demoDesc')
+
+  let video = null
+  let timer = null
+  let isOnScreen = false
+
+  function highlightStage(index) {
+    ;[...pipeline.children].forEach((el, i) => el.classList.toggle('is-active', i === index))
+  }
+
+  function highlightAllStages() {
+    ;[...pipeline.children].forEach(el => el.classList.add('is-active'))
+  }
+
+  function syncPlayback() {
+    clearInterval(timer)
+    timer = null
+
+    if (video) {
+      if (!canAutoplay) return
+      if (isOnScreen) video.play().catch(() => {})
+      else video.pause()
+      return
+    }
+
+    if (!canAutoplay) {
+      highlightAllStages()
+    } else if (isOnScreen) {
+      let index = 0
+      const count = pipeline.children.length
+      highlightStage(index)
+      timer = setInterval(() => {
+        index = (index + 1) % count
+        highlightStage(index)
+      }, PLACEHOLDER_STAGE_MS)
+    }
+  }
+
+  function showPlaceholder(demo) {
+    video = null
+    screen.innerHTML = `
+      <div class="demo__placeholder">
+        <div class="demo__placeholder-title">${demo.label}</div>
+        <div class="demo__placeholder-note">Demo recording coming soon</div>
+      </div>
+    `
+  }
+
+  function showVideo(demo) {
+    screen.innerHTML = `
+      <video muted loop playsinline preload="none" ${canAutoplay ? '' : 'controls'}
+        ${demo.poster ? `poster="${demo.poster}"` : ''} aria-label="${demo.videoAlt}">
+        ${demo.video.webm ? `<source src="${demo.video.webm}" type="video/webm" />` : ''}
+        <source src="${demo.video.mp4}" type="video/mp4" />
+      </video>
+      ${demo.hasAudio && canAutoplay ? '<button type="button" class="demo__sound">Play with sound</button>' : ''}
+    `
+    video = screen.querySelector('video')
+
+    if (canAutoplay) {
+      const sound = screen.querySelector('.demo__sound')
+      const clip = video
+      let lastTime = 0
+
+      function setMuted(muted) {
+        clip.muted = muted
+        sound.textContent = muted ? 'Play with sound' : 'Mute'
+      }
+
+      sound?.addEventListener('click', () => {
+        if (!clip.muted) {
+          setMuted(true)
+          return
+        }
+        // Start over so the visitor hears the question, not the middle of the reply.
+        clip.currentTime = 0
+        lastTime = 0
+        setMuted(false)
+        clip.play().catch(() => setMuted(true))
+      })
+
+      highlightStage(0)
+      clip.addEventListener('timeupdate', () => {
+        // Sound plays through once, then the loop continues muted.
+        if (sound && !clip.muted && clip.currentTime < lastTime - 1) setMuted(true)
+        lastTime = clip.currentTime
+
+        let index = 0
+        demo.stages.forEach((stage, i) => {
+          if (stage.at <= clip.currentTime) index = i
+        })
+        highlightStage(index)
+      })
+    } else {
+      highlightAllStages()
+    }
+
+    // If the hosted file fails to load, fall back to the placeholder.
+    screen.querySelector('source:last-of-type').addEventListener('error', () => {
+      showPlaceholder(demo)
+      syncPlayback()
+    })
+  }
+
+  function select(index) {
+    const demo = demos[index]
+    tabs.forEach((tab, i) => {
+      tab.setAttribute('aria-selected', String(i === index))
+      tab.tabIndex = i === index ? 0 : -1
+    })
+    panel.setAttribute('aria-labelledby', `demoTab${index}`)
+    pipeline.innerHTML = demo.stages.map(stage => `<li class="demo__stage">${stage.label}</li>`).join('')
+    desc.textContent = demo.description
+
+    video?.pause()
+    if (demo.video) showVideo(demo)
+    else showPlaceholder(demo)
+    syncPlayback()
+  }
+
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => select(i))
+    tab.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return
+      e.preventDefault()
+      const step = e.key === 'ArrowRight' ? 1 : -1
+      const next = (i + step + tabs.length) % tabs.length
+      select(next)
+      tabs[next].focus()
+    })
+  })
+
+  // Nothing downloads or animates until the demo is on screen.
+  new IntersectionObserver(([entry]) => {
+    isOnScreen = entry.isIntersecting
+    syncPlayback()
+  }, { threshold: 0.25 }).observe(screen)
+
+  select(0)
+}
+
 function renderAbout() {
   document.getElementById('aboutBio').innerHTML = content.bio
 
@@ -64,7 +236,7 @@ function renderTimeline() {
 function renderSkills() {
   const container = document.getElementById('skillsGrid')
   container.innerHTML = content.skills.map(group => `
-    <div class="skill-group glass" data-animate>
+    <div class="skill-group" data-animate>
       <div class="skill-group__title">${group.category}</div>
       <div class="skill-pills">
         ${group.items.map(item => `<span class="skill-pill">${item}</span>`).join('')}
@@ -81,17 +253,19 @@ function renderHighlights() {
         <div class="highlight-card__title">${item.title}</div>
         <div class="highlight-card__period">${item.period}</div>
       </div>
-      <div class="highlight-card__section">
-        <div class="highlight-card__label">Problem</div>
-        <p>${item.problem}</p>
-      </div>
-      <div class="highlight-card__section">
-        <div class="highlight-card__label">Approach</div>
-        <p>${item.approach}</p>
-      </div>
-      <div class="highlight-card__section">
-        <div class="highlight-card__label">Outcome</div>
-        <p>${item.outcome}</p>
+      <div class="highlight-card__body">
+        <div class="highlight-card__section">
+          <div class="highlight-card__label">Problem</div>
+          <p>${item.problem}</p>
+        </div>
+        <div class="highlight-card__section">
+          <div class="highlight-card__label">Approach</div>
+          <p>${item.approach}</p>
+        </div>
+        <div class="highlight-card__section">
+          <div class="highlight-card__label">Outcome</div>
+          <p>${item.outcome}</p>
+        </div>
       </div>
       <div class="highlight-card__tech">
         ${item.tech.map(t => `<span class="skill-pill">${t}</span>`).join('')}
@@ -118,6 +292,8 @@ function renderProjects() {
         <a href="${project.liveUrl}" target="_blank" rel="noopener noreferrer" class="project-card__link">
           ${icons.external} Live Demo
         </a>` : ''}
+        ${!project.links.length && !project.liveUrl ? `
+        <span class="project-card__private">Private repo, walkthrough on request</span>` : ''}
       </div>
     </div>
   `).join('')
@@ -131,7 +307,7 @@ function renderFooter() {
 function renderContact() {
   document.getElementById('contactCard').innerHTML = `
     <p class="contact__intro">
-      I'm always open to interesting conversations, new opportunities, or just a friendly chat about tech.
+      Have a role in mind, or want a walkthrough of one of my private projects? Send me an email.
     </p>
     <a href="mailto:${content.email}" class="btn btn--primary">
       ${icons.email} Say Hello
@@ -151,6 +327,9 @@ function renderContact() {
 }
 
 // ── Scroll Animations ──────────────────────────────────────
+// Longest stagger delay (360ms) plus the entrance transition (550ms), rounded up.
+const ENTRANCE_DONE_MS = 1000
+
 function initScrollAnimations() {
   const observer = new IntersectionObserver(
     (entries) => {
@@ -158,6 +337,7 @@ function initScrollAnimations() {
         if (entry.isIntersecting) {
           entry.target.classList.add('is-visible')
           observer.unobserve(entry.target)
+          setTimeout(() => entry.target.classList.add('is-settled'), ENTRANCE_DONE_MS)
         }
       })
     },
@@ -237,6 +417,7 @@ function initMobileMenu() {
 // ── Init ───────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   renderHero()
+  initHeroDemo()
   renderAbout()
   renderTimeline()
   renderHighlights()
