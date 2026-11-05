@@ -209,7 +209,7 @@ function renderTimeline() {
 function renderSkills() {
   const container = document.getElementById('skillsGrid')
   container.innerHTML = content.skills.map(group => `
-    <div class="skill-group glass" data-animate>
+    <div class="skill-group" data-animate>
       <div class="skill-group__title">${group.category}</div>
       <div class="skill-pills">
         ${group.items.map(item => `<span class="skill-pill">${item}</span>`).join('')}
@@ -226,17 +226,19 @@ function renderHighlights() {
         <div class="highlight-card__title">${item.title}</div>
         <div class="highlight-card__period">${item.period}</div>
       </div>
-      <div class="highlight-card__section">
-        <div class="highlight-card__label">Problem</div>
-        <p>${item.problem}</p>
-      </div>
-      <div class="highlight-card__section">
-        <div class="highlight-card__label">Approach</div>
-        <p>${item.approach}</p>
-      </div>
-      <div class="highlight-card__section">
-        <div class="highlight-card__label">Outcome</div>
-        <p>${item.outcome}</p>
+      <div class="highlight-card__body">
+        <div class="highlight-card__section">
+          <div class="highlight-card__label">Problem</div>
+          <p>${item.problem}</p>
+        </div>
+        <div class="highlight-card__section">
+          <div class="highlight-card__label">Approach</div>
+          <p>${item.approach}</p>
+        </div>
+        <div class="highlight-card__section">
+          <div class="highlight-card__label">Outcome</div>
+          <p>${item.outcome}</p>
+        </div>
       </div>
       <div class="highlight-card__tech">
         ${item.tech.map(t => `<span class="skill-pill">${t}</span>`).join('')}
@@ -278,7 +280,7 @@ function renderFooter() {
 function renderContact() {
   document.getElementById('contactCard').innerHTML = `
     <p class="contact__intro">
-      I'm always open to interesting conversations, new opportunities, or just a friendly chat about tech.
+      Have a role in mind, or want a walkthrough of one of my private projects? Send me an email.
     </p>
     <a href="mailto:${content.email}" class="btn btn--primary">
       ${icons.email} Say Hello

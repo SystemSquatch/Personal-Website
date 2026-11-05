@@ -22,6 +22,20 @@ export const content = {
   hero: {
     demos: [
       {
+        label: 'Professor Sakura',
+        description:
+          'An AI Pokémon professor you can chat with inside my DexDB app, designed to answer from live tool calls, not model memory.',
+        videoAlt: 'Silent demo of Professor Sakura answering a question about Bulbasaur in the DexDB app, followed by the evolution chain that confirms her answer.',
+        video: { mp4: '/demos/sakura.mp4', webm: '/demos/sakura.webm' },
+        poster: '/demos/sakura-poster.jpg',
+        stages: [
+          { label: 'Question', at: 0 },
+          { label: 'Tool call', at: 7.8 },
+          { label: 'Postgres lookup', at: 9.8 },
+          { label: 'Answer', at: 11.9 },
+        ],
+      },
+      {
         label: 'Voice Assistant',
         description:
           'A self-hosted voice assistant with a custom wake word, local speech-to-text, and a voice I fine-tuned myself.',
@@ -35,33 +49,20 @@ export const content = {
           { label: 'Custom voice', at: 9 },
         ],
       },
-      {
-        label: 'Professor Sakura',
-        description:
-          'An AI Pokémon professor you can chat with inside my DexDB app. Every fact comes from a live tool call, never from model memory.',
-        videoAlt: 'Silent demo of a chat with Professor Sakura inside the DexDB app.',
-        video: null,
-        poster: null,
-        stages: [
-          { label: 'Question', at: 0 },
-          { label: 'Tool call', at: 3 },
-          { label: 'Postgres lookup', at: 6 },
-          { label: 'Answer', at: 9 },
-        ],
-      },
     ],
   },
 
   // ── About / Bio ───────────────────────────────────────────
   // Supports inline HTML (<strong>, <a>, <br>)
-  bio: `I'm a full-stack software engineer with experience across backend, frontend,
-and cloud infrastructure, plus growing depth in security, compliance, and
-accessibility.
+  bio: `I'm a full-stack software engineer working across backend, frontend, and cloud
+infrastructure, with growing depth in security, compliance, and accessibility.
 <br><br>
-I specialize in taking large, ambiguous initiatives from design through production:
-cloud migrations, event-driven data pipelines, search infrastructure, and
-government-grade compliance work. I also coordinate a UI development team,
-distributing work and aligning implementation while staying hands-on.`,
+I take large initiatives from design through production: cloud migrations,
+event-driven data pipelines, search infrastructure, and government-grade compliance
+work.
+<br><br>
+Outside of work, I build self-hosted AI projects, including a voice assistant with a
+custom wake word and a voice I fine-tuned myself.`,
 
   // ── Education ─────────────────────────────────────────────
   // Shown as a small line in the footer, not its own section.
@@ -79,11 +80,12 @@ distributing work and aligning implementation while staying hands-on.`,
       start: 'Apr 2024',
       end: 'Present',
       bullets: [
-        'Coordinate a UI development team for an AI-assisted research product, distributing work, aligning implementation, and owning frontend delivery.',
-        'Built React micro-frontend features, including a Redux state store and cross-MFE reference syncing, and stood up a new micro-frontend end-to-end with its supporting AWS infrastructure.',
-        'Stood up OpenSearch cluster access via infrastructure-as-code and built the pipeline that loads and vectorizes documents from S3 into OpenSearch, including zero-downtime re-indexing.',
         'Designed the architecture for an event-driven fan-out delete pipeline using SNS and SQS with dead-letter queues for reliable, retryable cross-store data deletion.',
+        'Established automated accessibility testing in CI and drove remediation of screen-reader, contrast, focus, and text-spacing issues across the product.',
+        'Stood up OpenSearch cluster access via infrastructure-as-code and built the pipeline that loads and vectorizes documents from S3 into OpenSearch, including zero-downtime re-indexing.',
+        'Built React micro-frontend features, including a Redux state store and cross-MFE reference syncing, and stood up a new micro-frontend end-to-end with its supporting AWS infrastructure.',
         'Implemented a separate government/commercial encryption path with FIPS AMI support and dynamic authorization to enable compliant handling of FedRAMP data.',
+        'Wrote technical documentation and helped onboard and mentor engineers on the team.',
       ],
     },
     {
@@ -94,7 +96,7 @@ distributing work and aligning implementation while staying hands-on.`,
       bullets: [
         'Drove the migration of core services from on-prem Oracle to AWS Aurora PostgreSQL, partnering with backend and platform teams to set up dual-region disaster recovery and IAM-based authentication.',
         'Helped architect a serverless AWS batch processing pipeline that replaced manual on-prem systems, personally building several of its core services.',
-        'Led an organization-wide security modernization initiative, coordinating KMS encryption at rest across S3, DynamoDB, Lambda, and ECR.',
+        'Worked out how to implement KMS encryption at rest across S3, DynamoDB, Lambda, and ECR, and carried out the security remediation for my team.',
         'Owned the data-retention and purge subsystem across multiple releases, redesigning foreign-key/cascade behavior and resolving orphaned-data edge cases in production.',
         'Winner of the 2023 Thomson Reuters AI/ML Hackathon.',
       ],
@@ -104,14 +106,6 @@ distributing work and aligning implementation while staying hands-on.`,
   // ── Highlights ────────────────────────────────────────────
   // Deep-dive case studies (problem → approach → outcome). Most recent first.
   highlights: [
-    {
-      title: 'Custom Wake Word Training (Personal Project)',
-      period: '2026',
-      problem: 'My voice assistant needed its own wake word, but models trained only on synthetic speech kept missing real voices on a live mic.',
-      approach: 'Trained on synthetic speech plus similar-sounding decoy phrases, so the model learned the phrase itself, then mixed in a small set of real voice recordings and tested against unrelated real-world audio.',
-      outcome: 'The real recordings fixed live-mic detection. Adding too many made it worse with other voices, so they stay a small share of the training data.',
-      tech: ['openWakeWord', 'PyTorch', 'Orpheus TTS', 'ONNX'],
-    },
     {
       title: 'OpenSearch Search-Data Platform',
       period: '2026',
@@ -143,6 +137,14 @@ distributing work and aligning implementation while staying hands-on.`,
       approach: 'Built React micro-frontend features, including a Redux state store, cross-MFE reference syncing with a legacy web app, and responsive layouts, and stood up a new micro-frontend end-to-end with its supporting AWS infrastructure.',
       outcome: 'Delivered core UI for a strategic AI product and modernized the frontend architecture.',
       tech: ['React', 'Redux', 'TypeScript', 'AWS'],
+    },
+    {
+      title: 'Custom Wake Word Training (Personal Project)',
+      period: '2026',
+      problem: 'My voice assistant needed its own wake word, but models trained only on synthetic speech kept missing real voices on a live mic.',
+      approach: 'Trained on synthetic speech plus similar-sounding decoy phrases, so the model learned the phrase itself, then mixed in a small set of real voice recordings and tested against unrelated real-world audio.',
+      outcome: 'The real recordings fixed live-mic detection. Adding too many made it worse with other voices, so they stay a small share of the training data.',
+      tech: ['openWakeWord', 'PyTorch', 'Orpheus TTS', 'ONNX'],
     },
   ],
 
@@ -187,7 +189,7 @@ distributing work and aligning implementation while staying hands-on.`,
     {
       title: 'Voice Assistant',
       description:
-        'A self-hosted voice assistant built from separate services that talk over HTTP. Custom-trained openWakeWord models listen for the wake word, faster-whisper transcribes speech locally, Gemini or a local Ollama model replies using date, weather, and memory tools, and a fine-tuned Orpheus TTS voice served through llama.cpp speaks the answer.',
+        'A self-hosted voice assistant built as separate services. A custom-trained wake word starts it, faster-whisper transcribes speech locally, Gemini or a local Ollama model replies with date, weather, and memory tools, and a fine-tuned Orpheus voice speaks the answer.',
       tech: ['Python', 'FastAPI', 'openWakeWord', 'faster-whisper', 'Orpheus TTS', 'llama.cpp', 'Ollama', 'Gemini'],
       links: [],
       liveUrl: null,
@@ -195,7 +197,7 @@ distributing work and aligning implementation while staying hands-on.`,
     {
       title: 'PokeDataPipeline',
       description:
-        'A Python ETL pipeline that ingests Pokémon data from both PokeAPI and Bulbapedia into a self-hosted PostgreSQL database, covering items, Pokémon, moves, abilities, evolution chains, and locations. Writes are fully idempotent, so a multi-hour ingestion run can be safely stopped and resumed, and the resulting database is designed to be queried directly by a local LLM that generates SQL to answer natural-language Pokémon questions.',
+        'A Python ETL pipeline that loads Pokémon data from PokeAPI and Bulbapedia into PostgreSQL. Idempotent writes let a multi-hour run stop and resume safely, and the database is designed for a local LLM to query with generated SQL.',
       tech: ['Python', 'PostgreSQL', 'Docker', 'PokeAPI', 'Bulbapedia'],
       links: [],
       liveUrl: null,
@@ -203,7 +205,7 @@ distributing work and aligning implementation while staying hands-on.`,
     {
       title: 'DexDB',
       description:
-        'A full-stack Pokédex web app with a React/Vite frontend and a Node.js backend over PostgreSQL, including damage and catch-rate calculators, type-effectiveness lookups, ~19,000 locally cached sprite images, and an embedded chat widget wired into the Professor Sakura AI agent.',
+        'A full-stack Pokédex with a React frontend and a Node.js and PostgreSQL backend. It includes damage and catch-rate calculators, type-effectiveness lookups, and an embedded chat with Professor Sakura.',
       tech: ['React', 'Vite', 'Node.js', 'PostgreSQL'],
       links: [],
       liveUrl: null,
@@ -211,7 +213,7 @@ distributing work and aligning implementation while staying hands-on.`,
     {
       title: 'Professor Sakura',
       description:
-        'A tool-calling AI Pokémon "professor" with a persona hard-blocked from ever guessing game data from model memory; every fact comes from a live tool call against a self-hosted Postgres database, falling back to PokeAPI if it\'s unreachable. Runs as a FastAPI/CLI service with a swappable backend (Ollama on my home server, or Gemini in the cloud), plus a Discord bot front end sharing the same tool-calling pattern.',
+        'A tool-calling AI Pokémon professor designed to answer from live lookups, not model memory. It queries self-hosted Postgres, with PokeAPI as a fallback. Runs on Ollama or Gemini, with a Discord bot front end.',
       tech: ['Python', 'FastAPI', 'Ollama', 'Gemini', 'PostgreSQL', 'discord.js'],
       links: [],
       liveUrl: null,
@@ -219,7 +221,7 @@ distributing work and aligning implementation while staying hands-on.`,
     {
       title: 'Dexio',
       description:
-        'A Pokédex tracker for browsing every Pokémon, marking caught and shiny progress saved in the browser, and viewing stats, abilities, evolution chains, and per-game locations. Collections can be exported and restored as JSON.',
+        'A Pokédex tracker for marking caught and shiny progress in the browser and viewing stats, evolution chains, and per-game locations. Collections export and restore as JSON.',
       tech: ['React', 'Tailwind CSS', 'Firebase Hosting'],
       links: [],
       liveUrl: 'https://dexio-6b5cc.web.app',
