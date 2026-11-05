@@ -28,6 +28,151 @@ function renderHero() {
   document.getElementById('heroTagline').textContent = content.tagline
 }
 
+// ── Hero Demo ──────────────────────────────────────────────
+// Tabbed demo frame. A demo with video: null shows a placeholder until its
+// recording exists; see the comment on hero.demos in content.js.
+const PLACEHOLDER_STAGE_MS = 1800
+
+function initHeroDemo() {
+  const root = document.getElementById('heroDemo')
+  const demos = content.hero.demos
+  const canAutoplay =
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+    navigator.connection?.saveData !== true
+
+  root.innerHTML = `
+    <div class="demo glass">
+      <div class="demo__tabs" role="tablist" aria-label="Project demos">
+        ${demos.map((demo, i) => `
+        <button type="button" class="demo__tab" role="tab" id="demoTab${i}" aria-controls="demoPanel"
+          aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${demo.label}</button>`).join('')}
+      </div>
+      <div id="demoPanel" role="tabpanel" aria-labelledby="demoTab0">
+        <div class="demo__screen" id="demoScreen"></div>
+        <ol class="demo__pipeline" id="demoPipeline"></ol>
+        <p class="demo__desc" id="demoDesc"></p>
+      </div>
+    </div>
+  `
+
+  const tabs = [...root.querySelectorAll('.demo__tab')]
+  const panel = root.querySelector('#demoPanel')
+  const screen = root.querySelector('#demoScreen')
+  const pipeline = root.querySelector('#demoPipeline')
+  const desc = root.querySelector('#demoDesc')
+
+  let video = null
+  let timer = null
+  let isOnScreen = false
+
+  function highlightStage(index) {
+    ;[...pipeline.children].forEach((el, i) => el.classList.toggle('is-active', i === index))
+  }
+
+  function highlightAllStages() {
+    ;[...pipeline.children].forEach(el => el.classList.add('is-active'))
+  }
+
+  function syncPlayback() {
+    clearInterval(timer)
+    timer = null
+
+    if (video) {
+      if (!canAutoplay) return
+      if (isOnScreen) video.play().catch(() => {})
+      else video.pause()
+      return
+    }
+
+    if (!canAutoplay) {
+      highlightAllStages()
+    } else if (isOnScreen) {
+      let index = 0
+      const count = pipeline.children.length
+      highlightStage(index)
+      timer = setInterval(() => {
+        index = (index + 1) % count
+        highlightStage(index)
+      }, PLACEHOLDER_STAGE_MS)
+    }
+  }
+
+  function showPlaceholder(demo) {
+    video = null
+    screen.innerHTML = `
+      <div class="demo__placeholder">
+        <div class="demo__placeholder-title">${demo.label}</div>
+        <div class="demo__placeholder-note">Demo recording coming soon</div>
+      </div>
+    `
+  }
+
+  function showVideo(demo) {
+    screen.innerHTML = `
+      <video muted loop playsinline preload="none" ${canAutoplay ? '' : 'controls'}
+        ${demo.poster ? `poster="${demo.poster}"` : ''} aria-label="${demo.videoAlt}">
+        ${demo.video.webm ? `<source src="${demo.video.webm}" type="video/webm" />` : ''}
+        <source src="${demo.video.mp4}" type="video/mp4" />
+      </video>
+    `
+    video = screen.querySelector('video')
+
+    if (canAutoplay) {
+      highlightStage(0)
+      video.addEventListener('timeupdate', () => {
+        let index = 0
+        demo.stages.forEach((stage, i) => {
+          if (stage.at <= video.currentTime) index = i
+        })
+        highlightStage(index)
+      })
+    } else {
+      highlightAllStages()
+    }
+
+    // If the hosted file fails to load, fall back to the placeholder.
+    screen.querySelector('source:last-of-type').addEventListener('error', () => {
+      showPlaceholder(demo)
+      syncPlayback()
+    })
+  }
+
+  function select(index) {
+    const demo = demos[index]
+    tabs.forEach((tab, i) => {
+      tab.setAttribute('aria-selected', String(i === index))
+      tab.tabIndex = i === index ? 0 : -1
+    })
+    panel.setAttribute('aria-labelledby', `demoTab${index}`)
+    pipeline.innerHTML = demo.stages.map(stage => `<li class="demo__stage">${stage.label}</li>`).join('')
+    desc.textContent = demo.description
+
+    if (demo.video) showVideo(demo)
+    else showPlaceholder(demo)
+    syncPlayback()
+  }
+
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => select(i))
+    tab.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return
+      e.preventDefault()
+      const step = e.key === 'ArrowRight' ? 1 : -1
+      const next = (i + step + tabs.length) % tabs.length
+      select(next)
+      tabs[next].focus()
+    })
+  })
+
+  // Nothing downloads or animates until the demo is on screen.
+  new IntersectionObserver(([entry]) => {
+    isOnScreen = entry.isIntersecting
+    syncPlayback()
+  }, { threshold: 0.25 }).observe(screen)
+
+  select(0)
+}
+
 function renderAbout() {
   document.getElementById('aboutBio').innerHTML = content.bio
 
@@ -118,6 +263,8 @@ function renderProjects() {
         <a href="${project.liveUrl}" target="_blank" rel="noopener noreferrer" class="project-card__link">
           ${icons.external} Live Demo
         </a>` : ''}
+        ${!project.links.length && !project.liveUrl ? `
+        <span class="project-card__private">Private repo, walkthrough on request</span>` : ''}
       </div>
     </div>
   `).join('')
@@ -151,6 +298,9 @@ function renderContact() {
 }
 
 // ── Scroll Animations ──────────────────────────────────────
+// Longest stagger delay (360ms) plus the entrance transition (550ms), rounded up.
+const ENTRANCE_DONE_MS = 1000
+
 function initScrollAnimations() {
   const observer = new IntersectionObserver(
     (entries) => {
@@ -158,6 +308,7 @@ function initScrollAnimations() {
         if (entry.isIntersecting) {
           entry.target.classList.add('is-visible')
           observer.unobserve(entry.target)
+          setTimeout(() => entry.target.classList.add('is-settled'), ENTRANCE_DONE_MS)
         }
       })
     },
@@ -237,6 +388,7 @@ function initMobileMenu() {
 // ── Init ───────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   renderHero()
+  initHeroDemo()
   renderAbout()
   renderTimeline()
   renderHighlights()

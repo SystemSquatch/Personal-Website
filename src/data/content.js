@@ -13,6 +13,45 @@ export const content = {
   github: 'https://github.com/SystemSquatch',
   linkedin: 'https://www.linkedin.com/in/joseph-toniolo/',
 
+  // ── Hero Demos ────────────────────────────────────────────
+  // Silent clips shown as tabs in the hero.
+  // To add a recording, replace video: null with
+  //   video: { mp4: 'https://...', webm: 'https://...' }  (webm is optional)
+  // and set poster to an image URL. Then set each stage's `at` to the second in
+  // the clip where that stage begins, so the strip stays in sync with the video.
+  hero: {
+    demos: [
+      {
+        label: 'Voice Assistant',
+        description:
+          'A self-hosted voice assistant with a custom wake word, local speech-to-text, and a voice I fine-tuned myself.',
+        videoAlt: 'Silent, captioned demo of the voice assistant answering a spoken question.',
+        video: null,
+        poster: null,
+        stages: [
+          { label: 'Wake word', at: 0 },
+          { label: 'Speech to text', at: 3 },
+          { label: 'LLM + tools', at: 6 },
+          { label: 'Custom voice', at: 9 },
+        ],
+      },
+      {
+        label: 'Professor Sakura',
+        description:
+          'An AI Pokémon professor you can chat with inside my DexDB app. Every fact comes from a live tool call, never from model memory.',
+        videoAlt: 'Silent demo of a chat with Professor Sakura inside the DexDB app.',
+        video: null,
+        poster: null,
+        stages: [
+          { label: 'Question', at: 0 },
+          { label: 'Tool call', at: 3 },
+          { label: 'Postgres lookup', at: 6 },
+          { label: 'Answer', at: 9 },
+        ],
+      },
+    ],
+  },
+
   // ── About / Bio ───────────────────────────────────────────
   // Supports inline HTML (<strong>, <a>, <br>)
   bio: `I'm a full-stack software engineer with experience across backend, frontend,
@@ -66,6 +105,14 @@ distributing work and aligning implementation while staying hands-on.`,
   // Deep-dive case studies (problem → approach → outcome). Most recent first.
   highlights: [
     {
+      title: 'Custom Wake Word Training (Personal Project)',
+      period: '2026',
+      problem: 'My voice assistant needed its own wake word, but models trained only on synthetic speech kept missing real voices on a live mic.',
+      approach: 'Trained on synthetic speech plus similar-sounding decoy phrases, so the model learned the phrase itself, then mixed in a small set of real voice recordings and tested against unrelated real-world audio.',
+      outcome: 'The real recordings fixed live-mic detection. Adding too many made it worse with other voices, so they stay a small share of the training data.',
+      tech: ['openWakeWord', 'PyTorch', 'Orpheus TTS', 'ONNX'],
+    },
+    {
       title: 'OpenSearch Search-Data Platform',
       period: '2026',
       problem: 'The product needed documents searchable in OpenSearch, but there was no provisioned cluster access and no reliable way to load, reshape, or re-index the underlying data at scale.',
@@ -108,7 +155,11 @@ distributing work and aligning implementation while staying hands-on.`,
     },
     {
       category: 'Frameworks & Libraries',
-      items: ['Spring / Spring Boot', 'React', 'Redux', 'FastAPI'],
+      items: ['Spring / Spring Boot', 'React', 'Redux', 'FastAPI', 'Node.js'],
+    },
+    {
+      category: 'AI & Voice',
+      items: ['Tool-Calling Agents', 'Ollama', 'Gemini', 'TTS Fine-Tuning (Orpheus, Unsloth)', 'openWakeWord', 'faster-whisper', 'llama.cpp'],
     },
     {
       category: 'Cloud & Infrastructure (AWS)',
@@ -124,22 +175,29 @@ distributing work and aligning implementation while staying hands-on.`,
     },
     {
       category: 'DevOps & Practices',
-      items: ['GitHub Actions', 'CI/CD', 'Datadog', 'SonarQube'],
+      items: ['GitHub Actions', 'CI/CD', 'Docker', 'Datadog', 'SonarQube'],
     },
   ],
 
   // ── Projects ──────────────────────────────────────────────
   // liveUrl: null hides the "Live Demo" button automatically.
-  // links: one entry per repo to show as a button (most projects have 1).
+  // links: one entry per public repo to show as a button. Leave empty for private
+  // repos; with no links and no liveUrl, the card shows a "private repo" label.
   projects: [
+    {
+      title: 'Voice Assistant',
+      description:
+        'A self-hosted voice assistant built from separate services that talk over HTTP. Custom-trained openWakeWord models listen for the wake word, faster-whisper transcribes speech locally, Gemini or a local Ollama model replies using date, weather, and memory tools, and a fine-tuned Orpheus TTS voice served through llama.cpp speaks the answer.',
+      tech: ['Python', 'FastAPI', 'openWakeWord', 'faster-whisper', 'Orpheus TTS', 'llama.cpp', 'Ollama', 'Gemini'],
+      links: [],
+      liveUrl: null,
+    },
     {
       title: 'PokeDataPipeline',
       description:
         'A Python ETL pipeline that ingests Pokémon data from both PokeAPI and Bulbapedia into a self-hosted PostgreSQL database, covering items, Pokémon, moves, abilities, evolution chains, and locations. Writes are fully idempotent, so a multi-hour ingestion run can be safely stopped and resumed, and the resulting database is designed to be queried directly by a local LLM that generates SQL to answer natural-language Pokémon questions.',
       tech: ['Python', 'PostgreSQL', 'Docker', 'PokeAPI', 'Bulbapedia'],
-      links: [
-        { label: 'GitHub', url: 'https://github.com/SystemSquatch/PokeDataPipeline' },
-      ],
+      links: [],
       liveUrl: null,
     },
     {
@@ -147,9 +205,7 @@ distributing work and aligning implementation while staying hands-on.`,
       description:
         'A full-stack Pokédex web app with a React/Vite frontend and a Node.js backend over PostgreSQL, including damage and catch-rate calculators, type-effectiveness lookups, ~19,000 locally cached sprite images, and an embedded chat widget wired into the Professor Sakura AI agent.',
       tech: ['React', 'Vite', 'Node.js', 'PostgreSQL'],
-      links: [
-        { label: 'GitHub', url: 'https://github.com/SystemSquatch/DexDB-App' },
-      ],
+      links: [],
       liveUrl: null,
     },
     {
@@ -157,11 +213,16 @@ distributing work and aligning implementation while staying hands-on.`,
       description:
         'A tool-calling AI Pokémon "professor" with a persona hard-blocked from ever guessing game data from model memory; every fact comes from a live tool call against a self-hosted Postgres database, falling back to PokeAPI if it\'s unreachable. Runs as a FastAPI/CLI service with a swappable backend (Ollama on my home server, or Gemini in the cloud), plus a Discord bot front end sharing the same tool-calling pattern.',
       tech: ['Python', 'FastAPI', 'Ollama', 'Gemini', 'PostgreSQL', 'discord.js'],
-      links: [
-        { label: 'GitHub (Agent)', url: 'https://github.com/SystemSquatch/Professor-Sakura' },
-        { label: 'GitHub (Discord Bot)', url: 'https://github.com/SystemSquatch/Professor-Sakura-Discord-Bot' },
-      ],
+      links: [],
       liveUrl: null,
+    },
+    {
+      title: 'Dexio',
+      description:
+        'A Pokédex tracker for browsing every Pokémon, marking caught and shiny progress saved in the browser, and viewing stats, abilities, evolution chains, and per-game locations. Collections can be exported and restored as JSON.',
+      tech: ['React', 'Tailwind CSS', 'Firebase Hosting'],
+      links: [],
+      liveUrl: 'https://dexio-6b5cc.web.app',
     },
   ],
 }
