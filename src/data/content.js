@@ -14,11 +14,12 @@ export const content = {
   linkedin: 'https://www.linkedin.com/in/joseph-toniolo/',
 
   // ── Hero Demos ────────────────────────────────────────────
-  // Silent clips shown as tabs in the hero.
+  // Clips shown as tabs in the hero. They autoplay muted.
   // To add a recording, replace video: null with
   //   video: { mp4: 'https://...', webm: 'https://...' }  (webm is optional)
   // and set poster to an image URL. Then set each stage's `at` to the second in
   // the clip where that stage begins, so the strip stays in sync with the video.
+  // Set hasAudio: true to show a "Play with sound" button for that clip.
   hero: {
     demos: [
       {
@@ -42,14 +43,19 @@ export const content = {
         label: 'Voice Assistant',
         description:
           'A self-hosted voice assistant with a custom wake word, local speech-to-text, and a voice I fine-tuned myself.',
-        videoAlt: 'Silent, captioned demo of the voice assistant answering a spoken question.',
-        video: null,
-        poster: null,
+        videoAlt: 'Captioned demo of the voice assistant. Joseph asks about tomorrow\'s weather, the logs show the wake word and transcript, the assistant answers aloud, and the dashboard shows the get_weather tool call.',
+        hasAudio: true,
+        video: {
+          mp4: 'https://systemsquatch.github.io/portfolio-media/voice-assistant.mp4',
+          webm: 'https://systemsquatch.github.io/portfolio-media/voice-assistant.webm',
+        },
+        poster: 'https://systemsquatch.github.io/portfolio-media/voice-assistant-poster.jpg',
         stages: [
           { label: 'Wake word', at: 0 },
-          { label: 'Speech to text', at: 3 },
-          { label: 'LLM + tools', at: 6 },
-          { label: 'Custom voice', at: 9 },
+          { label: 'Speech to text', at: 0.9 },
+          { label: 'LLM + tools', at: 3.6 },
+          { label: 'Custom voice', at: 6.6 },
+          { label: 'Dashboard', at: 12.7 },
         ],
       },
     ],

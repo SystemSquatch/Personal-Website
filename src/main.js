@@ -114,15 +114,41 @@ function initHeroDemo() {
         ${demo.video.webm ? `<source src="${demo.video.webm}" type="video/webm" />` : ''}
         <source src="${demo.video.mp4}" type="video/mp4" />
       </video>
+      ${demo.hasAudio && canAutoplay ? '<button type="button" class="demo__sound">Play with sound</button>' : ''}
     `
     video = screen.querySelector('video')
 
     if (canAutoplay) {
+      const sound = screen.querySelector('.demo__sound')
+      const clip = video
+      let lastTime = 0
+
+      function setMuted(muted) {
+        clip.muted = muted
+        sound.textContent = muted ? 'Play with sound' : 'Mute'
+      }
+
+      sound?.addEventListener('click', () => {
+        if (!clip.muted) {
+          setMuted(true)
+          return
+        }
+        // Start over so the visitor hears the question, not the middle of the reply.
+        clip.currentTime = 0
+        lastTime = 0
+        setMuted(false)
+        clip.play().catch(() => setMuted(true))
+      })
+
       highlightStage(0)
-      video.addEventListener('timeupdate', () => {
+      clip.addEventListener('timeupdate', () => {
+        // Sound plays through once, then the loop continues muted.
+        if (sound && !clip.muted && clip.currentTime < lastTime - 1) setMuted(true)
+        lastTime = clip.currentTime
+
         let index = 0
         demo.stages.forEach((stage, i) => {
-          if (stage.at <= video.currentTime) index = i
+          if (stage.at <= clip.currentTime) index = i
         })
         highlightStage(index)
       })
@@ -147,6 +173,7 @@ function initHeroDemo() {
     pipeline.innerHTML = demo.stages.map(stage => `<li class="demo__stage">${stage.label}</li>`).join('')
     desc.textContent = demo.description
 
+    video?.pause()
     if (demo.video) showVideo(demo)
     else showPlaceholder(demo)
     syncPlayback()

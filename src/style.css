@@ -409,6 +409,26 @@ button { font-family: var(--font); }
   object-fit: cover;
 }
 
+.demo__sound {
+  position: absolute;
+  top: var(--sp-xs);
+  right: var(--sp-xs);
+  padding: 0.4rem 0.7rem;
+  background: rgba(4, 10, 7, 0.88);
+  border: 1px solid var(--color-accent);
+  border-radius: 4px;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+
+.demo__sound:hover {
+  background: var(--color-accent);
+  color: #04100a;
+}
+
 .demo__placeholder {
   position: absolute;
   inset: 0;
@@ -435,7 +455,9 @@ button { font-family: var(--font); }
 .demo__pipeline {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* One equal column per stage, however many a demo has */
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: var(--sp-xs);
   padding: var(--sp-sm);
   border-top: 1px solid var(--color-border);
@@ -989,7 +1011,10 @@ button { font-family: var(--font); }
     align-items: center;
   }
 
-  .demo__pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .demo__pipeline {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 
   .section__title { font-size: var(--text-xl); }
 
